@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 import java.lang.StringBuilder;
+import java.lang.Exception;
 
 /**
  *
@@ -15,7 +16,7 @@ public class State
     private Tile[][] puzzle;
     
     /**
-     * Set the puzzle state. The goal state  is "b12 345 678”
+     * Set the puzzle state. The goal state  is "b12 345 678"
      * @param str 
      */
     public void setState (String str)
@@ -63,11 +64,15 @@ public class State
     public String printState()
     {
         StringBuilder builder = new StringBuilder();
+        int count = 0;
         for (int i = 0; i < puzzle.length; i++)
         {
             for (int j = 0; j < puzzle[i].length; j++)
             {
+                if (((count % 3) == 0) && count > 0 && count < 8)
+                    builder.append(' ');
                 builder.append(puzzle[i][j].getValue());
+                count++;
             }
         }
         return builder.toString();
@@ -139,6 +144,71 @@ public class State
                puzzle[row + 1][col].setValue(temp);
            }
        }
+    }
+    
+    public void randomizeState (int n)
+    {
+        double r = 0.0;
+        for (int i = 0; i < n; i++)
+        {
+          r = Math.random();   //Need to deal with error catching
+          if (r <= 0.25)
+          {
+              try
+              {
+                  //statements that may cause an exception
+                  this.move("up");
+              }
+              catch (Exception e)
+              {
+                 //error handling code
+                 //What to do if can't move up?
+                 i -= 1;
+                 break;
+              }
+              //this.move("up");
+          }
+          else if (r > 0.25 && r <= 0.5)
+          {
+              try
+              {
+                  this.move("down");
+              }
+              catch (Exception e)
+              {
+                  i -= 1;
+                  break;
+              }
+              
+              //this.move("down");
+          }
+          else if (r > 0.5 && r <= 0.75)
+          {
+              try
+              {
+                  this.move("left");
+              }
+              catch (Exception e)
+              {
+                  i -= 1;
+                  break;
+              }
+              //this.move("left");
+          }
+          else //if (r > 0.75 && r <= 1.0)
+          {
+              try
+              {
+                  this.move("right");
+              }
+              catch (Exception e)
+              {
+                  i -= 1;
+                  break;
+              }
+              //this.move("right");
+          }
+        }
     }
     /**
      * Main Method
