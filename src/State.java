@@ -5,7 +5,8 @@
  */
 import java.lang.*;
 import java.util.Scanner;
-import java.util.PriorityQueue;
+//import java.util.PriorityQueue;
+//import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.*;
@@ -23,6 +24,7 @@ public class State
     
     //Matrix to store the goal board
     final Tile[][] goalState;
+    
     
     //String to store Scanner line
     //private static String str;
@@ -56,6 +58,14 @@ public class State
     public Tile[][] getPuzzle()
     {
         return this.puzzle;
+    }
+    
+    /**
+     * Method to set the puzzle state with a tile matrix
+     */
+    public void setPuzzle(Tile[][] state)
+    {
+        this.puzzle = state;
     }
     
     /**
@@ -133,18 +143,20 @@ public class State
     
     /**
      * Method to swap the blank tile up, down, left or right
-     * @param dir Direction 
+     * @param dir Direction
+     * @return Tile[][] New State
      */
-    public void move (String dir)
+    public Tile[][] move (String dir)
     {
        int temp;  //Used to swap Tile values
        int row = 0;
        int col = 0;
-       for (int i = 0; i < puzzle.length; i++)
+       Tile[][] result = puzzle;
+       for (int i = 0; i < result.length; i++)
        {
-            for (int j = 0; j < puzzle[i].length; j++)
+            for (int j = 0; j < result[i].length; j++)
             {
-                if (puzzle[i][j].getValue() == 0)
+                if (result[i][j].getValue() == 0)
                 {
                     row = i;
                     col = j;
@@ -159,41 +171,43 @@ public class State
                     throw new IndexOutOfBoundsException("Left is out of bounds!");  //Switched with Up
                 else
                 {
-                    temp = puzzle[row][col].getValue();
-                    puzzle[row][col].setValue(puzzle[row][col - 1].getValue());
-                    puzzle[row][col - 1].setValue(temp);
+                    temp = result[row][col].getValue();
+                    result[row][col].setValue(result[row][col - 1].getValue());
+                    result[row][col - 1].setValue(temp);
                 }    break;
             case "right":
                 if ((col + 1) == 3)
                     throw new IndexOutOfBoundsException("Right is out of bounds!"); //Switched with Down
                 else
                 {
-                    temp = puzzle[row][col].getValue();
-                    puzzle[row][col].setValue(puzzle[row][col + 1].getValue());
-                    puzzle[row][col + 1].setValue(temp);
+                    temp = result[row][col].getValue();
+                    result[row][col].setValue(result[row][col + 1].getValue());
+                    result[row][col + 1].setValue(temp);
                 }    break;
             case "up":
                 if ((row - 1) == -1)
                     throw new IndexOutOfBoundsException("Up is out of bounds!");
                 else
                 {
-                    temp = puzzle[row][col].getValue();
-                    puzzle[row][col].setValue(puzzle[row - 1][col].getValue());
-                    puzzle[row - 1][col].setValue(temp);
+                    temp = result[row][col].getValue();
+                    result[row][col].setValue(result[row - 1][col].getValue());
+                    result[row - 1][col].setValue(temp);
                 }    break;
             case "down":
                 if ((row + 1) == 3)
                     throw new IndexOutOfBoundsException("Down is out of bounds!");
                 else
                 {
-                    temp = puzzle[row][col].getValue();
-                    puzzle[row][col].setValue(puzzle[row + 1][col].getValue());
-                    puzzle[row + 1][col].setValue(temp);
+                    temp = result[row][col].getValue();
+                    result[row][col].setValue(result[row + 1][col].getValue());
+                    result[row + 1][col].setValue(temp);
                 }    break;
             default:
                 System.out.println("Invalid Direction, no move made!");
                 break;
         }
+        //puzzle = result;  //In practice I think we want to keep the state as-is
+        return result;
     }
     
     /**
@@ -316,7 +330,7 @@ public class State
     }
     
     /**
-     * Method to return the number of misplaced tiles
+     * Method to return the number of misplaced tiles (h1)
      * @param s
      * @return 
      */
@@ -338,7 +352,7 @@ public class State
     }
     
     /**
-     * Method to compute and return the total Manhattan distance for a given state/board
+     * Method to compute and return the total Manhattan distance for a given state/board (h2)
      * @param s
      * @return 
      */
@@ -365,43 +379,12 @@ public class State
     }
     
     /**
-     * Method to solve the puzzle using h1
-     * @param s
-     * @return 
+     * Method to solve the puzzle using local beam search with k states
+     * @param k 
      */
-    public int h1(State s)
+    public void solveBeam(int k)
     {
-        return 0;
-    }
-    
-    /**
-     * Method to calculate the total manhattan distance of each tile
-     * @param s
-     * @return 
-     */
-    public int h2(State s)
-    {
-       return 0; 
-    }
-    
-    /**
-     * Method to solve the 8-puzzle using A* search
-     * @param heuristic h1 or h2
-     * @return 
-     */
-    public String solveAStar(String heuristic)
-    {
-       PriorityQueue <State> stateTree = new PriorityQueue();  //Priority Queue to handle A* search, Need to make a Node class
-       if (heuristic.equals("h1"))  //# of misplaced tiles
-       {
-          return "h1"; 
-       }
-       else if (heuristic.equals("h2"))
-       {
-          return "h2";
-       }
-       else
-           return "Invalid Heuristic!";
+        
     }
     
     /**
