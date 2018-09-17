@@ -146,7 +146,7 @@ public class State
      * @param dir Direction
      * @return Tile[][] New State
      */
-    public Tile[][] move (String dir)
+    public State move (String dir)  //Returned a Tile[][] before
     {
        int temp;  //Used to swap Tile values
        int row = 0;
@@ -207,7 +207,9 @@ public class State
                 break;
         }
         //puzzle = result;  //In practice I think we want to keep the state as-is
-        return result;
+        State newState = new State();
+        newState.setPuzzle(result);
+        return newState;  //return result
     }
     
     /**
@@ -315,6 +317,19 @@ public class State
         {
             this.move(command[1]);
         }
+        else if (command[0].equals("solve"))
+        {
+            if (command[1].equals("A-star"))
+            {
+                AStarSearch a = new AStarSearch(this, command[2]);  //use this state object for our A-Star state?
+                a.solveAStar();
+            }
+            else if (command[1].equals("beam"))
+            {
+                //Create Beamsearch object
+                //Call beam search method
+            }
+        }
         else if (command[0].equals("quit"))
             return;
     }
@@ -324,9 +339,9 @@ public class State
      * @param s
      * @return 
      */
-    public boolean isGoalState(State s)
+    public boolean isGoalState()
     {
-        return s.printState().equals("b12 345 678");
+        return this.printState().equals("b12 345 678");
     }
     
     /**
@@ -334,9 +349,9 @@ public class State
      * @param s
      * @return 
      */
-    public int getMisplacedTiles(State s)
+    public int getMisplacedTiles()
     {
-       Tile[][] board = s.getPuzzle();
+       Tile[][] board = this.getPuzzle();
        int count = 0;
        for (int i = 0; i < board.length; i++)
        {
@@ -356,10 +371,10 @@ public class State
      * @param s
      * @return 
      */
-    public int getDistance(State s) 
+    public int getDistance() 
     {
        int totalDistance = 0;
-       Tile[][] board = s.getPuzzle();
+       Tile[][] board = this.getPuzzle();
        for (int i = 0; i < board.length; i++)
        {
           for (int j = 0; j < board[i].length; j++) 

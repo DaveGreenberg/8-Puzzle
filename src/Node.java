@@ -11,10 +11,16 @@
 public class Node implements Comparable<Node>
 {
    //Store the state in this node
-   private State board;
+   private State state;
    
    //Store the number of moves to get to this Node
    private int numMoves;
+   
+   //Store the parent node
+   private Node parent;
+   
+   //Store the action applied to the parent node to get to current node
+   private String action;
    
    //Store the g(n) value of the node; actual cost to reach node n from start (# moves to this point)
    private int g;
@@ -30,29 +36,30 @@ public class Node implements Comparable<Node>
    
    /**
     * Constructor
-    * @param board
-    * @param numMoves
-    * @param g
-    * @param h 
+    * @param state State for this node
+    * @param g Number of moves to this state
+    * @param h Estimated cost (Misplaced tile for h1, Manhattan for h2)
+    * @param action move that parent used to get to this state
+    * @param parent Node's parent
     */
-   public Node(State board, int numMoves, int g, int h)
+   public Node(State state, int g, int h, String action, Node parent)
    {
-      this.board = board;
-      this.numMoves = numMoves;
+      this.state = state;
       this.h = h;
       this.g = g;
+      this.parent = parent;
       this.f = h + g;
       this.expanded = false;
    }
 
-   public State getBoard() 
+   public State getState() 
    {
-       return board;
+       return state;
    }
 
-   public void setBoard(State board) 
+   public void setState(State state) 
    {
-       this.board = board;
+       this.state = state;
    }
 
    public int getNumMoves() 
@@ -95,6 +102,10 @@ public class Node implements Comparable<Node>
        this.f = f;
    }
    
+   public void setExpanded(boolean answer) 
+   {
+       this.expanded = answer;
+   }
    
    /**
     * Want to compare Nodes based on total F value

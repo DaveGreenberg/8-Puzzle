@@ -14,36 +14,44 @@ import java.util.PriorityQueue;
  */
 public class AStarSearch 
 {
+    //Store the starting node
     private Node start;
     
     //Store the number of moves needed to reach the goal state
     private int numMovesNeeded;
     
-    //
+    //Store if h1 or h2
     private String heuristic;
     
     //Store the sequence of moves
     ArrayList<String> moveList = new ArrayList<String>();
  
     //PriorityQueue to store Nodes for searches
-    PriorityQueue <Node> stateTree = new PriorityQueue();  //Priority Queue to handle A* search, Need to make a Node class
+    PriorityQueue <Node> stateTree = new PriorityQueue();  //Priority Queue to handle A* search
     
-    public AStarSearch(int g, int h, State s, String heuristic)
+    public AStarSearch(State s, String heuristic)
     {
-        
+       this.start = new Node(s, 0, 0, "", null);
+       this.heuristic = heuristic;
     }
     
     /**
      * Method to get the successors of the current state
      * @return 
      */
-    public State getSuccessors(State s)
+    public void getSuccessors(Node n)  //Should pass in a Node as input
     {
-       ArrayList<Tile[][]> list = new ArrayList<Tile[][]>();   //Need to package the successors into nodes, adding 1 to their cost function
-       ArrayList<State> stateList = new ArrayList<State>();
+       //ArrayList<State> stateList = new ArrayList<State>();
+       Node newNode = null;
        try
        {
-          list.add(s.move("up"));
+          //stateList.add(n.getState().move("up")); 
+           if (this.heuristic.equals ("h1"))
+               newNode = new Node (n.getState().move("up"), n.getNumMoves() + 1, n.getState().move("up").getMisplacedTiles(),"up", n);
+           else if (this.heuristic.equals ("h2"))
+               newNode = new Node (n.getState().move("up"), n.getNumMoves() + 1, n.getState().move("up").getDistance(),"up", n);
+           stateTree.add (newNode);
+           //Fix the rest of the try statements in this method
        }
        catch (Exception e)
        {
@@ -51,7 +59,12 @@ public class AStarSearch
        }
        try
        {
-          list.add(s.move("down"));
+          //stateList.add(n.getState().move("down"));
+           if (this.heuristic.equals ("h1"))
+               newNode = new Node (n.getState().move("down"), n.getNumMoves() + 1, n.getState().move("down").getMisplacedTiles(),"down", n);
+           else if (this.heuristic.equals ("h2"))
+               newNode = new Node (n.getState().move("down"), n.getNumMoves() + 1, n.getState().move("down").getDistance(),"down", n);
+           stateTree.add (newNode);
        }
        catch (Exception e)
        {
@@ -59,7 +72,12 @@ public class AStarSearch
        }
        try
        {
-          list.add(s.move("left"));
+          //stateList.add(n.getState().move("left"));
+           if (this.heuristic.equals ("h1"))
+               newNode = new Node (n.getState().move("left"), n.getNumMoves() + 1, n.getState().move("left").getMisplacedTiles(),"left", n);
+           else if (this.heuristic.equals ("h2"))
+               newNode = new Node (n.getState().move("left"), n.getNumMoves() + 1, n.getState().move("left").getDistance(),"left", n);
+           stateTree.add (newNode);
        }
        catch (Exception e)
        {
@@ -67,44 +85,52 @@ public class AStarSearch
        }
        try
        {
-          list.add(s.move("right"));
+          //stateList.add(n.getState().move("right"));
+           if (this.heuristic.equals ("h1"))
+               newNode = new Node (n.getState().move("right"), n.getNumMoves() + 1, n.getState().move("right").getMisplacedTiles(),"right", n);
+           else if (this.heuristic.equals ("h2"))
+               newNode = new Node (n.getState().move("right"), n.getNumMoves() + 1, n.getState().move("right").getDistance(),"right", n);
+           stateTree.add (newNode);
        }
        catch (Exception e)
        {
            ;
        }
-       for (int i = 0; i < list.size(); i++)
+       /*for (int i = 0; i < stateList.size(); i++)
        {
-          State temp = new State();
-          Node n;
-          temp.setPuzzle(list.get(i));
+          Node other = null;
           if (heuristic.equals("h1"))
-            n = new Node (temp, 1, 1, temp.getMisplacedTiles(temp));
+            other = new Node (stateList.get(i), 1, 1, stateList.get(i).getMisplacedTiles());
           else if (heuristic.equals("h2"))
-            n = new Node (temp, 1, 1, temp.getDistance(temp));
+            other = new Node (stateList.get(i), 1, 1, stateList.get(i).getDistance());
+          stateTree.add(other);
           //Is the # of moves to this point the g, and the h is either h1 or h2?
           //Create a new Node, increment the Node's # moves to this point, adjust estimated distance?
-       }
+       } */
        this.numMovesNeeded++;
-       return s;
     }
     
     /**
      * Method to solve the 8-puzzle using A* search
-     * @param heuristic h1 or h2
      * @return 
      */
-    public String solveAStar(String heuristic)
+    public String solveAStar()
     {
-       if (heuristic.equals("h1"))  //# of misplaced tiles
+       stateTree.add(start);
+       if (!(start.getState().isGoalState()))
        {
-          return "h1"; 
-       }
-       else if (heuristic.equals("h2"))
-       {
-          return "h2";
+           //Start node is not goal state
+           Node firstNode;
+           while (!(firstNode = stateTree.remove()).getState().isGoalState())  //When to return the solution, is the goal node stored?
+           {
+               this.getSuccessors (firstNode);
+               firstNode.setExpanded (true);
+           }
+           //Maybe make a method that appends all the moves to a Stringbuilder as it works its way up the node tree
+           //Append the g function from the goalNode to that to show the # moves?
+           return "List numMoves and sequence of moves";  //Is the numMoves the g value of the goal node? How to pull sequence of moves?
        }
        else
-           return "Invalid Heuristic!";
+           return "Puzzle already solved";
     } 
 }
