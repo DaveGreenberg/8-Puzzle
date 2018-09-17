@@ -10,8 +10,9 @@ import java.util.Scanner;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.*;
+
 /**
- * A class to represent the board of the 8-puzzle
+ * A class to represent the state of the 8-puzzle
  * @author David Greenberg
  */
 public class State 
@@ -146,7 +147,7 @@ public class State
      * @param dir Direction
      * @return Tile[][] New State
      */
-    public State move (String dir)  //Returned a Tile[][] before
+    public State move (String dir)
     {
        int temp;  //Used to swap Tile values
        int row = 0;
@@ -321,8 +322,9 @@ public class State
         {
             if (command[1].equals("A-star"))
             {
-                AStarSearch a = new AStarSearch(this, command[2]);  //use this state object for our A-Star state?
+                AStarSearch a = new AStarSearch(this, command[2]);
                 a.solveAStar();
+                System.out.println("Calling A*");
             }
             else if (command[1].equals("beam"))
             {
@@ -336,12 +338,21 @@ public class State
     
     /**
      * Method to check if the current state is the goal state
-     * @param s
      * @return 
      */
     public boolean isGoalState()
     {
-        return this.printState().equals("b12 345 678");
+        int count = 0;
+        for (int i = 0; i < this.getPuzzle().length; i++)
+        {
+            for (int j = 0; j < this.getPuzzle()[i].length; j++)
+            {
+                if (this.getPuzzle()[i][j].getValue() != count)
+                    return false;
+                count++;
+            }
+        }
+        return true;
     }
     
     /**

@@ -1,7 +1,7 @@
 
 import java.util.ArrayList;
 import java.util.PriorityQueue;
-
+import java.util.Stack;
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -17,9 +17,6 @@ public class AStarSearch
     //Store the starting node
     private Node start;
     
-    //Store the number of moves needed to reach the goal state
-    private int numMovesNeeded;
-    
     //Store if h1 or h2
     private String heuristic;
     
@@ -31,27 +28,27 @@ public class AStarSearch
     
     public AStarSearch(State s, String heuristic)
     {
-       this.start = new Node(s, 0, 0, "", null);
+       this.start = new Node(s, 0, heuristic.equals("h1") ? s.getMisplacedTiles() : s.getDistance(), "", null);
        this.heuristic = heuristic;
     }
     
     /**
      * Method to get the successors of the current state
+     * @param n Node to get successors of
      * @return 
      */
-    public void getSuccessors(Node n)  //Should pass in a Node as input
+    public void getSuccessors(Node n)
     {
-       //ArrayList<State> stateList = new ArrayList<State>();
        Node newNode = null;
        try
        {
-          //stateList.add(n.getState().move("up")); 
+           State moved = n.getState().move("up");
            if (this.heuristic.equals ("h1"))
-               newNode = new Node (n.getState().move("up"), n.getNumMoves() + 1, n.getState().move("up").getMisplacedTiles(),"up", n);
+               newNode = new Node (moved, n.getNumMoves() + 1, moved.getMisplacedTiles(),"up", n);
            else if (this.heuristic.equals ("h2"))
-               newNode = new Node (n.getState().move("up"), n.getNumMoves() + 1, n.getState().move("up").getDistance(),"up", n);
+               newNode = new Node (moved, n.getNumMoves() + 1, moved.getDistance(),"up", n);
            stateTree.add (newNode);
-           //Fix the rest of the try statements in this method
+           System.out.println("Up Successor: " + newNode.getState().printState());
        }
        catch (Exception e)
        {
@@ -59,12 +56,13 @@ public class AStarSearch
        }
        try
        {
-          //stateList.add(n.getState().move("down"));
+           State moved = n.getState().move("down");
            if (this.heuristic.equals ("h1"))
-               newNode = new Node (n.getState().move("down"), n.getNumMoves() + 1, n.getState().move("down").getMisplacedTiles(),"down", n);
+               newNode = new Node (moved, n.getNumMoves() + 1, moved.getMisplacedTiles(),"down", n);
            else if (this.heuristic.equals ("h2"))
-               newNode = new Node (n.getState().move("down"), n.getNumMoves() + 1, n.getState().move("down").getDistance(),"down", n);
+               newNode = new Node (moved, n.getNumMoves() + 1, moved.getDistance(),"down", n);
            stateTree.add (newNode);
+           System.out.println("Down Successor: " + newNode.getState().printState());
        }
        catch (Exception e)
        {
@@ -72,12 +70,13 @@ public class AStarSearch
        }
        try
        {
-          //stateList.add(n.getState().move("left"));
+           State moved = n.getState().move("left");
            if (this.heuristic.equals ("h1"))
-               newNode = new Node (n.getState().move("left"), n.getNumMoves() + 1, n.getState().move("left").getMisplacedTiles(),"left", n);
+               newNode = new Node (moved, n.getNumMoves() + 1, moved.getMisplacedTiles(),"left", n);
            else if (this.heuristic.equals ("h2"))
-               newNode = new Node (n.getState().move("left"), n.getNumMoves() + 1, n.getState().move("left").getDistance(),"left", n);
+               newNode = new Node (moved, n.getNumMoves() + 1, moved.getDistance(),"left", n);
            stateTree.add (newNode);
+           System.out.println("Left Successor: " + newNode.getState().printState());
        }
        catch (Exception e)
        {
@@ -85,29 +84,42 @@ public class AStarSearch
        }
        try
        {
-          //stateList.add(n.getState().move("right"));
+           State moved = n.getState().move("right");
            if (this.heuristic.equals ("h1"))
-               newNode = new Node (n.getState().move("right"), n.getNumMoves() + 1, n.getState().move("right").getMisplacedTiles(),"right", n);
+               newNode = new Node (moved, n.getNumMoves() + 1, moved.getMisplacedTiles(),"right", n);
            else if (this.heuristic.equals ("h2"))
-               newNode = new Node (n.getState().move("right"), n.getNumMoves() + 1, n.getState().move("right").getDistance(),"right", n);
+               newNode = new Node (moved, n.getNumMoves() + 1, moved.getDistance(),"right", n);
            stateTree.add (newNode);
+           System.out.println("Right Successor: " + newNode.getState().printState());
        }
        catch (Exception e)
        {
            ;
        }
-       /*for (int i = 0; i < stateList.size(); i++)
-       {
-          Node other = null;
-          if (heuristic.equals("h1"))
-            other = new Node (stateList.get(i), 1, 1, stateList.get(i).getMisplacedTiles());
-          else if (heuristic.equals("h2"))
-            other = new Node (stateList.get(i), 1, 1, stateList.get(i).getDistance());
-          stateTree.add(other);
-          //Is the # of moves to this point the g, and the h is either h1 or h2?
-          //Create a new Node, increment the Node's # moves to this point, adjust estimated distance?
-       } */
-       this.numMovesNeeded++;
+       //Of the generated successors, all of them are wrong
+       //Successors are sharing States to do the operation on (i.e. Up affects the proper Node, but then Down affects the Node after Up's change
+    }
+    
+    /**
+     * Method to return the sequence of moves from start --> goal in order
+     * @param n
+     * @return 
+     */
+    public String getSequence(Node n)
+    {
+          Stack<String> stack = new Stack<String>();
+          StringBuilder builder = new StringBuilder();
+          while (n.getParent() != null)
+          {
+              stack.push(n.getAction());
+              n = n.getParent();
+          }
+          while (! (stack.empty()))
+          {
+              builder.append(stack.pop());
+              builder.append(' ');
+          }
+          return builder.toString();
     }
     
     /**
@@ -120,17 +132,25 @@ public class AStarSearch
        if (!(start.getState().isGoalState()))
        {
            //Start node is not goal state
-           Node firstNode;
-           while (!(firstNode = stateTree.remove()).getState().isGoalState())  //When to return the solution, is the goal node stored?
+           Node firstNode = stateTree.poll();
+           System.out.println("Node being pulled off PQ: " + firstNode.getState().printState());
+           while (!(firstNode.getState().isGoalState()))
            {
-               this.getSuccessors (firstNode);
-               firstNode.setExpanded (true);
+               if (!(firstNode.getExpanded()))
+               {
+                  this.getSuccessors (firstNode);
+                  firstNode.setExpanded (true);
+               }
            }
            //Maybe make a method that appends all the moves to a Stringbuilder as it works its way up the node tree
            //Append the g function from the goalNode to that to show the # moves?
-           return "List numMoves and sequence of moves";  //Is the numMoves the g value of the goal node? How to pull sequence of moves?
+           System.out.println("Number of moves: " + firstNode.getG() + " Sequence of moves: "+ this.getSequence(firstNode));
+           return "Number of moves: " + firstNode.getG() + " Sequence of moves: "+ this.getSequence(firstNode);
        }
        else
+       {
+           System.out.println("Puzzle already solved!");
            return "Puzzle already solved";
+       }
     } 
 }

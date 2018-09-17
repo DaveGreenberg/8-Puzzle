@@ -96,6 +96,16 @@ public class Node implements Comparable<Node>
    {
        return f;
    }
+   
+   public String getAction() 
+   {
+       return this.action;
+   }
+   
+   public Node getParent() 
+   {
+       return this.parent;
+   }
 
    public void setF(int f) 
    {
@@ -105,6 +115,11 @@ public class Node implements Comparable<Node>
    public void setExpanded(boolean answer) 
    {
        this.expanded = answer;
+   }
+   
+   public boolean getExpanded() 
+   {
+       return this.expanded;
    }
    
    /**
