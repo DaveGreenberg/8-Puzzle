@@ -149,10 +149,18 @@ public class State
      */
     public State move (String dir)
     {
-       int temp;  //Used to swap Tile values
+       //int temp;  //Used to swap Tile values
+       Tile temp;
        int row = 0;
        int col = 0;
-       Tile[][] result = puzzle;
+       Tile[][] result = new Tile[3][3];
+       for (int i = 0; i < puzzle.length; i++)
+       {
+            for (int j = 0; j < puzzle[i].length; j++)
+            {
+                result[i][j] = puzzle[i][j];
+            }
+       }
        for (int i = 0; i < result.length; i++)
        {
             for (int j = 0; j < result[i].length; j++)
@@ -172,36 +180,48 @@ public class State
                     throw new IndexOutOfBoundsException("Left is out of bounds!");  //Switched with Up
                 else
                 {
-                    temp = result[row][col].getValue();
+                    /*temp = result[row][col].getValue();
                     result[row][col].setValue(result[row][col - 1].getValue());
-                    result[row][col - 1].setValue(temp);
+                    result[row][col - 1].setValue(temp); */
+                    temp = result[row][col];
+                    result[row][col] = result[row][col - 1];
+                    result[row][col - 1] = temp;
                 }    break;
             case "right":
                 if ((col + 1) == 3)
                     throw new IndexOutOfBoundsException("Right is out of bounds!"); //Switched with Down
                 else
                 {
-                    temp = result[row][col].getValue();
+                    /*temp = result[row][col].getValue();
                     result[row][col].setValue(result[row][col + 1].getValue());
-                    result[row][col + 1].setValue(temp);
+                    result[row][col + 1].setValue(temp); */
+                    temp = result[row][col];
+                    result[row][col] = result[row][col + 1];
+                    result[row][col + 1] = temp;
                 }    break;
             case "up":
                 if ((row - 1) == -1)
                     throw new IndexOutOfBoundsException("Up is out of bounds!");
                 else
                 {
-                    temp = result[row][col].getValue();
+                    /*temp = result[row][col].getValue();
                     result[row][col].setValue(result[row - 1][col].getValue());
-                    result[row - 1][col].setValue(temp);
+                    result[row - 1][col].setValue(temp); */
+                    temp = result[row][col];
+                    result[row][col] = result[row - 1][col];
+                    result[row - 1][col] = temp;
                 }    break;
             case "down":
                 if ((row + 1) == 3)
                     throw new IndexOutOfBoundsException("Down is out of bounds!");
                 else
                 {
-                    temp = result[row][col].getValue();
+                    /*temp = result[row][col].getValue();
                     result[row][col].setValue(result[row + 1][col].getValue());
-                    result[row + 1][col].setValue(temp);
+                    result[row + 1][col].setValue(temp); */
+                    temp = result[row][col];
+                    result[row][col] = result[row + 1][col];
+                    result[row + 1][col] = temp;
                 }    break;
             default:
                 System.out.println("Invalid Direction, no move made!");
@@ -219,6 +239,13 @@ public class State
      */
     public void randomizeState (int n)
     {
+        /*
+        * Check where the 0 tile is and store the coordinate
+        * Check what moves are in bounds
+        * Append legal moves to an array list
+        ** Use if statements from move method
+        * Use Math.random() * list.length() to pick an index of the list
+        */
         double r; //Store the random #
         for (int i = 0; i < n; i++)
         {
@@ -394,7 +421,7 @@ public class State
               if (value != 0)  //0 represents the blank tile, don't process it
               {
                   int goalRow = (value - 1) / board.length; // Row of tile in Goal State
-                  int goalCol = (value - 1) % board.length; // Column of tile in Goal State
+                  int goalCol = (value) % board.length;     // Column of tile in Goal State FIXME: somehow getting wrong columns and rows
                   int distRow = i - goalRow;                // Distance to the goal row
                   int distCol = j - goalCol;                // Distance to the goal Column
                   totalDistance += Math.abs(distRow) + Math.abs(distCol);   //Distance could be negative, confirm it's positive 
@@ -410,7 +437,8 @@ public class State
      */
     public void solveBeam(int k)
     {
-        
+        //max Nodes is:
+        //If a search looks at n-nodes, abadnon the search, indicate an error
     }
     
     /**

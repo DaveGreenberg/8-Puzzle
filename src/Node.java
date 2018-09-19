@@ -47,6 +47,7 @@ public class Node implements Comparable<Node>
       this.state = state;
       this.h = h;
       this.g = g;
+      this.action = action;
       this.parent = parent;
       this.f = h + g;
       this.expanded = false;

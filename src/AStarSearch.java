@@ -28,6 +28,7 @@ public class AStarSearch
     
     public AStarSearch(State s, String heuristic)
     {
+       //Package the state that called A* into a node
        this.start = new Node(s, 0, heuristic.equals("h1") ? s.getMisplacedTiles() : s.getDistance(), "", null);
        this.heuristic = heuristic;
     }
@@ -35,18 +36,20 @@ public class AStarSearch
     /**
      * Method to get the successors of the current state
      * @param n Node to get successors of
-     * @return 
      */
     public void getSuccessors(Node n)
     {
        Node newNode = null;
+       //Print the reference in memory or test for inequality
+       //Move the blank tile up
+        System.out.println("1: " + n.getState().printState());
        try
        {
            State moved = n.getState().move("up");
            if (this.heuristic.equals ("h1"))
-               newNode = new Node (moved, n.getNumMoves() + 1, moved.getMisplacedTiles(),"up", n);
+               newNode = new Node (moved, n.getG() + 1, moved.getMisplacedTiles(),"up", n);
            else if (this.heuristic.equals ("h2"))
-               newNode = new Node (moved, n.getNumMoves() + 1, moved.getDistance(),"up", n);
+               newNode = new Node (moved, n.getG() + 1, moved.getDistance(),"up", n);
            stateTree.add (newNode);
            System.out.println("Up Successor: " + newNode.getState().printState());
        }
@@ -54,13 +57,15 @@ public class AStarSearch
        {
            ;
        }
+       System.out.println("2: " + n.getState().printState());
+       //Move the blank tile down
        try
        {
            State moved = n.getState().move("down");
            if (this.heuristic.equals ("h1"))
-               newNode = new Node (moved, n.getNumMoves() + 1, moved.getMisplacedTiles(),"down", n);
+               newNode = new Node (moved, n.getG() + 1, moved.getMisplacedTiles(),"down", n);
            else if (this.heuristic.equals ("h2"))
-               newNode = new Node (moved, n.getNumMoves() + 1, moved.getDistance(),"down", n);
+               newNode = new Node (moved, n.getG() + 1, moved.getDistance(),"down", n);
            stateTree.add (newNode);
            System.out.println("Down Successor: " + newNode.getState().printState());
        }
@@ -68,13 +73,15 @@ public class AStarSearch
        {
            ;
        }
+       System.out.println("3: " + n.getState().printState());
+       //Move the blank tile left
        try
        {
            State moved = n.getState().move("left");
            if (this.heuristic.equals ("h1"))
-               newNode = new Node (moved, n.getNumMoves() + 1, moved.getMisplacedTiles(),"left", n);
+               newNode = new Node (moved, n.getG() + 1, moved.getMisplacedTiles(),"left", n);
            else if (this.heuristic.equals ("h2"))
-               newNode = new Node (moved, n.getNumMoves() + 1, moved.getDistance(),"left", n);
+               newNode = new Node (moved, n.getG() + 1, moved.getDistance(),"left", n);
            stateTree.add (newNode);
            System.out.println("Left Successor: " + newNode.getState().printState());
        }
@@ -82,13 +89,15 @@ public class AStarSearch
        {
            ;
        }
+       System.out.println("4: " + n.getState().printState());
+       //Move the blank tile right
        try
        {
            State moved = n.getState().move("right");
            if (this.heuristic.equals ("h1"))
-               newNode = new Node (moved, n.getNumMoves() + 1, moved.getMisplacedTiles(),"right", n);
+               newNode = new Node (moved, n.getG() + 1, moved.getMisplacedTiles(),"right", n);
            else if (this.heuristic.equals ("h2"))
-               newNode = new Node (moved, n.getNumMoves() + 1, moved.getDistance(),"right", n);
+               newNode = new Node (moved, n.getG() + 1, moved.getDistance(),"right", n);
            stateTree.add (newNode);
            System.out.println("Right Successor: " + newNode.getState().printState());
        }
@@ -107,13 +116,16 @@ public class AStarSearch
      */
     public String getSequence(Node n)
     {
-          Stack<String> stack = new Stack<String>();
+          Stack<String> stack = new Stack<>();
           StringBuilder builder = new StringBuilder();
-          while (n.getParent() != null)
+          
+          //Push all moves onto Stack to get them in order
+          while (n != null)
           {
               stack.push(n.getAction());
               n = n.getParent();
           }
+          //Pop the moves off so they are in order
           while (! (stack.empty()))
           {
               builder.append(stack.pop());
@@ -128,24 +140,25 @@ public class AStarSearch
      */
     public String solveAStar()
     {
+       stateTree.clear(); //Clear the PQ before use
        stateTree.add(start);
        if (!(start.getState().isGoalState()))
        {
            //Start node is not goal state
            Node firstNode = stateTree.poll();
-           System.out.println("Node being pulled off PQ: " + firstNode.getState().printState());
-           while (!(firstNode.getState().isGoalState()))
+           System.out.println("State of Node being pulled off PQ: " + firstNode.getState().printState());
+           while (!(firstNode.getState().isGoalState())) 
            {
                if (!(firstNode.getExpanded()))
                {
                   this.getSuccessors (firstNode);
                   firstNode.setExpanded (true);
                }
+               firstNode = stateTree.poll();
            }
-           //Maybe make a method that appends all the moves to a Stringbuilder as it works its way up the node tree
-           //Append the g function from the goalNode to that to show the # moves?
-           System.out.println("Number of moves: " + firstNode.getG() + " Sequence of moves: "+ this.getSequence(firstNode));
-           return "Number of moves: " + firstNode.getG() + " Sequence of moves: "+ this.getSequence(firstNode);
+           String sequence = this.getSequence(firstNode);
+           System.out.println("Number of moves: " + firstNode.getG() + " Sequence of moves: "+ sequence);
+           return "Number of moves: " + firstNode.getG() + " Sequence of moves: "+ sequence;
        }
        else
        {
