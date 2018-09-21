@@ -26,6 +26,9 @@ public class State
     //Used to store what the current state is
     public State currentState;
     
+    //Store max nodes
+    public static int maxNodes = Integer.MAX_VALUE;
+    
     
     //String to store Scanner line
     //private static String str;
@@ -279,19 +282,6 @@ public class State
     }
     
     /**
-    * Read commands from text file
-    * @param file file to read from
-    * @throws IOException
-    */
-    public void readFile(String file) throws IOException
-    {
-        BufferedReader reader = new BufferedReader(new FileReader(file)); 
-        String str; 
-        while ((str = reader.readLine()) != null) 
-            this.acceptCommands(str);
-    }
-    
-    /**
      * Method to handle commands from the Scanner and input file
      * @param command 
      */
@@ -314,18 +304,23 @@ public class State
         {
             this.move(command[1]);
         }
+        else if (command[0].equals ("maxNodes"))
+        {
+            maxNodes = Integer.parseInt(command[1]);
+        }
         else if (command[0].equals("solve"))
         {
             if (command[1].equals("A-star"))
             {
                 AStarSearch a = new AStarSearch(this, command[2]);
-                a.solveAStar();
-                System.out.println("Calling A*");
+                System.out.println("Calling A*...");
+                a.solveAStar(maxNodes);
             }
             else if (command[1].equals("beam"))
             {
-                //Create Beamsearch object
-                //Call beam search method
+                BeamSearch b = new BeamSearch(this, Integer.parseInt(command[2]));
+                System.out.println("Calling Beam...");
+                b.solveBeam(Integer.parseInt(command[2]));
             }
         }
         else if (command[0].equals("quit"))
@@ -398,20 +393,6 @@ public class State
           }
        }
        return totalDistance;
-    }
-    
-    /**
-     * Method to solve the puzzle using local beam search with k states
-     * @param k 
-     */
-    public void solveBeam(int k)
-    {
-        //max Nodes is:
-        //If a search looks at n-nodes, abadnon the search, indicate an error
-        //Use a PQ
-        //Get all successors and put on a separate PQ if haven't been expanded, then move the k best to the actual PQ
-        //Clear the successor PQ
-        //Use h2 to compare them
     }
     
     /**

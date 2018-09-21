@@ -2,6 +2,7 @@
 import java.util.ArrayList;
 import java.util.PriorityQueue;
 import java.util.Stack;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -9,28 +10,45 @@ import java.util.Stack;
  */
 
 /**
- * A class to handle solving the 8-puzzle with A* search
+ *
  * @author Dave
  */
-public class AStarSearch 
+public class BeamSearch 
 {
+    //Fields
     //Store the starting node
-    private Node start;
+    private BeamNode start;
     
-    //Store if h1 or h2
-    private String heuristic;
+    //Store k-value
+    private int k;
     
     //Store the sequence of moves
     ArrayList<String> moveList = new ArrayList<String>();
  
-    //PriorityQueue to store Nodes for searches
-    PriorityQueue <Node> stateTree = new PriorityQueue();  //Priority Queue to handle A* search
+    //Main PQ to help with beam search
+    PriorityQueue <BeamNode> mainPQ = new PriorityQueue();
     
-    public AStarSearch(State s, String heuristic)
+    //PQ to order the k-best successors
+    PriorityQueue <BeamNode> successorPQ = new PriorityQueue();
+    
+    /**
+     * Constructor
+     * @param s
+     * @param k 
+     */ 
+    public BeamSearch(State s, int k)
     {
-       //Package the state that called A* into a node
-       this.start = new Node(s, 0, heuristic.equals("h1") ? s.getMisplacedTiles() : s.getDistance(), "", null);
-       this.heuristic = heuristic;
+       this.start = new BeamNode(s, 0, s.getDistance(), "", null);
+       this.k = k;
+    }
+    
+    /**
+     * Method to retrieve the k value
+     * @return int k
+     */
+    public int getK()
+    {
+        return this.k;
     }
     
     /**
@@ -39,18 +57,14 @@ public class AStarSearch
      */
     public void getSuccessors(Node n)
     {
-       Node newNode = null;
-       //Print the reference in memory or test for inequality
-       //Move the blank tile up
-        //System.out.println("1: " + n.getState().printState());
+       BeamNode newNode = null;
+       //System.out.println("1: " + n.getState().printState());
        try
        {
            State moved = n.getState().move("up");
-           if (this.heuristic.equals ("h1"))
-               newNode = new Node (moved, n.getG() + 1, moved.getMisplacedTiles(),"up", n);
-           else if (this.heuristic.equals ("h2"))
-               newNode = new Node (moved, n.getG() + 1, moved.getDistance(),"up", n);
-           stateTree.add (newNode);
+           newNode = new BeamNode (moved, n.getG() + 1, moved.getDistance(),"up", n);
+           //Question for Jacob: Should I make the g-value always 0, since we are only evaluating off the heuristic?
+           successorPQ.add (newNode);
            //System.out.println("Up Successor: " + newNode.getState().printState());
        }
        catch (Exception e)
@@ -62,11 +76,8 @@ public class AStarSearch
        try
        {
            State moved = n.getState().move("down");
-           if (this.heuristic.equals ("h1"))
-               newNode = new Node (moved, n.getG() + 1, moved.getMisplacedTiles(),"down", n);
-           else if (this.heuristic.equals ("h2"))
-               newNode = new Node (moved, n.getG() + 1, moved.getDistance(),"down", n);
-           stateTree.add (newNode);
+           newNode = new BeamNode (moved, n.getG() + 1, moved.getDistance(),"down", n);
+           successorPQ.add (newNode);
            //System.out.println("Down Successor: " + newNode.getState().printState());
        }
        catch (Exception e)
@@ -78,11 +89,8 @@ public class AStarSearch
        try
        {
            State moved = n.getState().move("left");
-           if (this.heuristic.equals ("h1"))
-               newNode = new Node (moved, n.getG() + 1, moved.getMisplacedTiles(),"left", n);
-           else if (this.heuristic.equals ("h2"))
-               newNode = new Node (moved, n.getG() + 1, moved.getDistance(),"left", n);
-           stateTree.add (newNode);
+           newNode = new BeamNode (moved, n.getG() + 1, moved.getDistance(),"left", n);
+           successorPQ.add (newNode);
            //System.out.println("Left Successor: " + newNode.getState().printState());
        }
        catch (Exception e)
@@ -94,11 +102,8 @@ public class AStarSearch
        try
        {
            State moved = n.getState().move("right");
-           if (this.heuristic.equals ("h1"))
-               newNode = new Node (moved, n.getG() + 1, moved.getMisplacedTiles(),"right", n);
-           else if (this.heuristic.equals ("h2"))
-               newNode = new Node (moved, n.getG() + 1, moved.getDistance(),"right", n);
-           stateTree.add (newNode);
+           newNode = new BeamNode (moved, n.getG() + 1, moved.getDistance(),"right", n);
+           successorPQ.add (newNode);
            //System.out.println("Right Successor: " + newNode.getState().printState());
        }
        catch (Exception e)
@@ -136,36 +141,52 @@ public class AStarSearch
     
     /**
      * Method to solve the 8-puzzle using A* search
+     * @param k Nodes to consider
      * @return 
      */
-    public String solveAStar(int maxNodes)
+    public String solveBeam(int k)
     {
-       stateTree.clear(); //Clear the PQ before use
-       stateTree.add(start);
-       int counter = 0;
+       //max Nodes is:
+       //If a search looks at n-nodes, abadnon the search, indicate an error
+       //Use a PQ
+       //Get all successors and put on a separate PQ if haven't been expanded, then move the k best to the actual PQ
+       //Clear the successor PQ
+       //Use h2 to compare them
+       mainPQ.clear(); //Clear the PQ before use
+       mainPQ.add(start);
+       boolean done = false;
+       BeamNode goalNode = null;
        if (!(start.getState().isGoalState()))
        {
            //Start node is not goal state
-           Node firstNode = stateTree.poll();
-           //System.out.println("State of Node being pulled off PQ: " + firstNode.getState().printState
-           while (!(firstNode.getState().isGoalState())) 
+           //System.out.println("State of Node being pulled off PQ: " + firstNode.getState().printState());
+           outerLoop:
+           while (!done) 
            {
-               if (!(firstNode.getExpanded()))
+               int counter = 0;
+               while ((! mainPQ.isEmpty()) && (counter <= k))
                {
-                  this.getSuccessors (firstNode);
-                  firstNode.setExpanded (true);
+                    BeamNode firstNode = mainPQ.poll();
+                    if ((firstNode.getState().isGoalState()))
+                    {
+                        done = true;
+                        goalNode = firstNode;
+                        break outerLoop;
+                    }
+                    
+                    if (!(firstNode.getExpanded()))
+                    {
+                       this.getSuccessors (firstNode);
+                       firstNode.setExpanded (true);
+                    }
+                    counter++;
                }
-               firstNode = stateTree.poll();
-               counter++;
-               if (counter > maxNodes)
-               {
-                   System.out.println("Max Node Limit Reached!  A* couldn't complete!");
-                   return "Max Node Limit Reached!  A* couldn't complete!";
-               }
+               mainPQ = successorPQ;
+               successorPQ = new PriorityQueue();
            }
-           String sequence = this.getSequence(firstNode);
-           System.out.println("A* Search Done! Number of moves: " + firstNode.getG() + ".\tSequence of moves: "+ sequence + '.');
-           return "Number of moves: " + firstNode.getG() + " Sequence of moves: "+ sequence;
+           String sequence = this.getSequence(goalNode);
+           System.out.println("Beam Search Done! Number of moves: " + goalNode.getG() + ".\tSequence of moves: "+ sequence + '.');
+           return "Number of moves: " + goalNode.getG() + " Sequence of moves: "+ sequence;
        }
        else
        {
