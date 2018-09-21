@@ -6,7 +6,7 @@
 import java.lang.*;
 import java.util.Scanner;
 //import java.util.PriorityQueue;
-//import java.util.ArrayList;
+import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.*;
@@ -20,11 +20,11 @@ public class State
     //Matrix to store the board of the 8-puzzle
     private Tile[][] puzzle;
     
-    //String to store the file name
-    private String inputFile;
-    
     //Matrix to store the goal board
     final Tile[][] goalState;
+    
+    //Used to store what the current state is
+    public State currentState;
     
     
     //String to store Scanner line
@@ -43,15 +43,6 @@ public class State
         goalState[2][1] = new Tile(7);
         goalState[2][2] = new Tile(8);
     }
-    
-    /**
-     * Constructor to accept a file
-     * @param file 
-     */
-    /*public State(String file)
-    {
-        this.inputFile = file;
-    } */
     
     /**
      * Method to return the puzzle state/board
@@ -149,7 +140,6 @@ public class State
      */
     public State move (String dir)
     {
-       //int temp;  //Used to swap Tile values
        Tile temp;
        int row = 0;
        int col = 0;
@@ -239,73 +229,52 @@ public class State
      */
     public void randomizeState (int n)
     {
-        /*
-        * Check where the 0 tile is and store the coordinate
-        * Check what moves are in bounds
-        * Append legal moves to an array list
-        ** Use if statements from move method
-        * Use Math.random() * list.length() to pick an index of the list
-        */
-        double r; //Store the random #
-        for (int i = 0; i < n; i++)
+        ArrayList<String> legalMoves = new ArrayList<>();
+        for (int moves = 0; moves < n; moves++)
         {
-          r = Math.random();   //Need to deal with error catching
-          if (r <= 0.25)
-          {
-              try
-              {
-                  //statements that may cause an exception
-                  this.move("up");
-              }
-              catch (Exception e)
-              {
-                 //error handling code
-                 //What to do if can't move up?
-                 i -= 1;
-                 break;
-              }
-              //this.move("up");
-          }
-          else if (r > 0.25 && r <= 0.5)
-          {
-              try
-              {
-                  this.move("down");
-              }
-              catch (Exception e)
-              {
-                  i -= 1;
-                  break;
-              }
-              
-              //this.move("down");
-          }
-          else if (r > 0.5 && r <= 0.75)
-          {
-              try
-              {
-                  this.move("left");
-              }
-              catch (Exception e)
-              {
-                  i -= 1;
-                  break;
-              }
-              //this.move("left");
-          }
-          else //if (r > 0.75 && r <= 1.0)
-          {
-              try
-              {
-                  this.move("right");
-              }
-              catch (Exception e)
-              {
-                  i -= 1;
-                  break;
-              }
-              //this.move("right");
-          }
+            int row = 0;
+            int col = 0;
+            for (int i = 0; i < this.getPuzzle().length; i++)
+            {
+                for (int j = 0; j < this.getPuzzle()[i].length; j++)
+                {
+                    if (this.getPuzzle()[i][j].getValue() == 0)
+                    {
+                        row = i;
+                        col = j;
+                    }
+                }
+            }
+            //System.out.println("Blank Tile coords: (" + row + ", " + col + ")");
+            
+            legalMoves.clear();
+            //Now, Gather the possible moves
+
+            //left is possible
+            if (! ((col - 1) == -1))
+            {
+               legalMoves.add("left");
+            }
+            //right is possible
+            if (! ((col + 1) == 3))
+            {
+               legalMoves.add("right");  
+            }
+            //up is possible
+            if (! ((row - 1) == -1))
+            {
+               legalMoves.add("up"); 
+            }
+            //down is possible
+            if (! ((row + 1) == 3))
+            {
+               legalMoves.add("down");
+            }
+            
+            //Now, figure out which of the legal moves to do
+            int r = (int) (Math.random() * legalMoves.size());
+            //System.out.println("Size of legal Moves: "+ legalMoves.size() + " r: " + r);
+            puzzle = this.move (legalMoves.get(r)).getPuzzle();
         }
     }
     
@@ -439,6 +408,10 @@ public class State
     {
         //max Nodes is:
         //If a search looks at n-nodes, abadnon the search, indicate an error
+        //Use a PQ
+        //Get all successors and put on a separate PQ if haven't been expanded, then move the k best to the actual PQ
+        //Clear the successor PQ
+        //Use h2 to compare them
     }
     
     /**
@@ -448,13 +421,27 @@ public class State
     public static void main (String[] args)
     {
       State s = new State(); //Modify to accept 1 argument for the text file
-      Scanner scan = new Scanner (System.in);
+      /*Scanner scan = new Scanner (System.in);
       String cmd = "";
       while (!(cmd.equals("quit")))
       {
           cmd = scan.nextLine();
          //str = scan.nextLine();
          s.acceptCommands(cmd);
+      } */
+      try
+      {
+        Scanner reader = new Scanner(new File(args[0]));
+        while (reader.hasNext())
+        {
+          String str = reader.nextLine();
+          s.acceptCommands(str);
+        }
+        reader.close();
+      }
+      catch (Exception e)
+      {
+        System.out.println("No input file found!"); 
       }
     }
 }
