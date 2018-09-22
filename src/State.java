@@ -1,14 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-import java.lang.*;
 import java.util.Scanner;
-//import java.util.PriorityQueue;
+import java.util.Random;
 import java.util.ArrayList;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.*;
 
 /**
@@ -26,13 +18,15 @@ public class State
     //Used to store what the current state is
     public State currentState;
     
-    //Store max nodes
+    //Store max nodes (for A* Search)
     public static int maxNodes = Integer.MAX_VALUE;
     
+    //Random object for consistent random # generation
+    Random rnd = new Random();
     
-    //String to store Scanner line
-    //private static String str;
-    
+    /**
+     * Constructor to set up the goal State and the random number seed
+     */
     public State()
     {
         this.goalState = new Tile[3][3];
@@ -45,10 +39,13 @@ public class State
         goalState[2][0] = new Tile(6);
         goalState[2][1] = new Tile(7);
         goalState[2][2] = new Tile(8);
+        
+        rnd.setSeed(1234567890);
     }
     
     /**
      * Method to return the puzzle state/board
+     * @return Tile[][] puzzle
      */
     public Tile[][] getPuzzle()
     {
@@ -57,6 +54,7 @@ public class State
     
     /**
      * Method to set the puzzle state with a tile matrix
+     * @param state puzzle state to set
      */
     public void setPuzzle(Tile[][] state)
     {
@@ -65,7 +63,7 @@ public class State
     
     /**
      * Set the puzzle state. The goal state  is "b12 345 678"
-     * @param str 
+     * @param str State 
      */
     public void setState (String str)
     {
@@ -139,7 +137,7 @@ public class State
     /**
      * Method to swap the blank tile up, down, left or right
      * @param dir Direction
-     * @return Tile[][] New State
+     * @return State new State after move
      */
     public State move (String dir)
     {
@@ -220,10 +218,9 @@ public class State
                 System.out.println("Invalid Direction, no move made!");
                 break;
         }
-        //puzzle = result;  //In practice I think we want to keep the state as-is
         State newState = new State();
         newState.setPuzzle(result);
-        return newState;  //return result
+        return newState;
     }
     
     /**
@@ -248,7 +245,6 @@ public class State
                     }
                 }
             }
-            //System.out.println("Blank Tile coords: (" + row + ", " + col + ")");
             
             legalMoves.clear();
             //Now, Gather the possible moves
@@ -274,16 +270,15 @@ public class State
                legalMoves.add("down");
             }
             
-            //Now, figure out which of the legal moves to do
-            int r = (int) (Math.random() * legalMoves.size());
-            //System.out.println("Size of legal Moves: "+ legalMoves.size() + " r: " + r);
+            //Now, figure out which of the legal moves to do randomly
+            int r = (int) (rnd.nextInt (legalMoves.size()));
             puzzle = this.move (legalMoves.get(r)).getPuzzle();
         }
     }
     
     /**
      * Method to handle commands from the Scanner and input file
-     * @param command 
+     * @param inputString command 
      */
     public void acceptCommands(String inputString)
     {
@@ -329,7 +324,7 @@ public class State
     
     /**
      * Method to check if the current state is the goal state
-     * @return 
+     * @return boolean if this puzzle is the goal state 
      */
     public boolean isGoalState()
     {
@@ -348,8 +343,7 @@ public class State
     
     /**
      * Method to return the number of misplaced tiles (h1)
-     * @param s
-     * @return 
+     * @return int number of tiles out of place
      */
     public int getMisplacedTiles()
     {
@@ -370,8 +364,7 @@ public class State
     
     /**
      * Method to compute and return the total Manhattan distance for a given state/board (h2)
-     * @param s
-     * @return 
+     * @return Manhattan distance of the board
      */
     public int getDistance() 
     {
@@ -397,11 +390,11 @@ public class State
     
     /**
      * Main Method, takes a text-file name as input
-     * @param args 
+     * @param args input file 
      */
     public static void main (String[] args)
     {
-      State s = new State(); //Modify to accept 1 argument for the text file
+      State s = new State();
       /*Scanner scan = new Scanner (System.in);
       String cmd = "";
       while (!(cmd.equals("quit")))
@@ -410,6 +403,7 @@ public class State
          //str = scan.nextLine();
          s.acceptCommands(cmd);
       } */
+      
       try
       {
         Scanner reader = new Scanner(new File(args[0]));

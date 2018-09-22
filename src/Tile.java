@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
  * Class to represent a Tile
@@ -10,11 +5,12 @@
  */
 public class Tile 
 {
-    //Fields
+    //Value of the tile
     private int value;
     
     /**
      * Constructor
+     * @param val Value to store in the Tile
      */
     public Tile (int val)
     {
@@ -22,7 +18,7 @@ public class Tile
     }
     
     /**
-     * 
+     * Get the value
      * @return value
      */
     public int getValue()
@@ -31,7 +27,7 @@ public class Tile
     }
     
     /**
-     * 
+     * Set the value
      * @param val 
      */
     public void setValue(int val)

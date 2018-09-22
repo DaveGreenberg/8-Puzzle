@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
  * A class to package the States into the Priority Queue
@@ -52,7 +47,7 @@ public class Node implements Comparable<Node>
       this.f = h + g;
       this.expanded = false;
    }
-
+   
    public State getState() 
    {
        return state;

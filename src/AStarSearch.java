@@ -2,11 +2,6 @@
 import java.util.ArrayList;
 import java.util.PriorityQueue;
 import java.util.Stack;
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
  * A class to handle solving the 8-puzzle with A* search
@@ -24,8 +19,13 @@ public class AStarSearch
     ArrayList<String> moveList = new ArrayList<String>();
  
     //PriorityQueue to store Nodes for searches
-    PriorityQueue <Node> stateTree = new PriorityQueue();  //Priority Queue to handle A* search
+    PriorityQueue <Node> stateTree = new PriorityQueue();
     
+    /**
+     * Constructor
+     * @param s State of starting node
+     * @param heuristic h1 or h2
+     */
     public AStarSearch(State s, String heuristic)
     {
        //Package the state that called A* into a node
@@ -35,14 +35,12 @@ public class AStarSearch
     
     /**
      * Method to get the successors of the current state
-     * @param n Node to get successors of
+     * @param n Node to get successors for
      */
     public void getSuccessors(Node n)
     {
        Node newNode = null;
-       //Print the reference in memory or test for inequality
        //Move the blank tile up
-        //System.out.println("1: " + n.getState().printState());
        try
        {
            State moved = n.getState().move("up");
@@ -51,13 +49,11 @@ public class AStarSearch
            else if (this.heuristic.equals ("h2"))
                newNode = new Node (moved, n.getG() + 1, moved.getDistance(),"up", n);
            stateTree.add (newNode);
-           //System.out.println("Up Successor: " + newNode.getState().printState());
        }
        catch (Exception e)
        {
            ;
        }
-       //System.out.println("2: " + n.getState().printState());
        //Move the blank tile down
        try
        {
@@ -67,13 +63,11 @@ public class AStarSearch
            else if (this.heuristic.equals ("h2"))
                newNode = new Node (moved, n.getG() + 1, moved.getDistance(),"down", n);
            stateTree.add (newNode);
-           //System.out.println("Down Successor: " + newNode.getState().printState());
        }
        catch (Exception e)
        {
            ;
        }
-       //System.out.println("3: " + n.getState().printState());
        //Move the blank tile left
        try
        {
@@ -83,13 +77,11 @@ public class AStarSearch
            else if (this.heuristic.equals ("h2"))
                newNode = new Node (moved, n.getG() + 1, moved.getDistance(),"left", n);
            stateTree.add (newNode);
-           //System.out.println("Left Successor: " + newNode.getState().printState());
        }
        catch (Exception e)
        {
            ;
        }
-       //System.out.println("4: " + n.getState().printState());
        //Move the blank tile right
        try
        {
@@ -99,20 +91,17 @@ public class AStarSearch
            else if (this.heuristic.equals ("h2"))
                newNode = new Node (moved, n.getG() + 1, moved.getDistance(),"right", n);
            stateTree.add (newNode);
-           //System.out.println("Right Successor: " + newNode.getState().printState());
        }
        catch (Exception e)
        {
            ;
        }
-       //Of the generated successors, all of them are wrong
-       //Successors are sharing States to do the operation on (i.e. Up affects the proper Node, but then Down affects the Node after Up's change
     }
     
     /**
      * Method to return the sequence of moves from start --> goal in order
-     * @param n
-     * @return 
+     * @param n Node to get the sequence from (goal Node)
+     * @return String sequence of moves
      */
     public String getSequence(Node n)
     {
@@ -136,7 +125,8 @@ public class AStarSearch
     
     /**
      * Method to solve the 8-puzzle using A* search
-     * @return 
+     * @param maxNodes maximum nodes to consider in the search
+     * @return String # moves & sequence of moves to get from start Node --> Goal Node
      */
     public String solveAStar(int maxNodes)
     {
@@ -145,9 +135,7 @@ public class AStarSearch
        int counter = 0;
        if (!(start.getState().isGoalState()))
        {
-           //Start node is not goal state
            Node firstNode = stateTree.poll();
-           //System.out.println("State of Node being pulled off PQ: " + firstNode.getState().printState
            while (!(firstNode.getState().isGoalState())) 
            {
                if (!(firstNode.getExpanded()))
