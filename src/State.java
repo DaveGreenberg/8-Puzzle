@@ -171,9 +171,6 @@ public class State
                     throw new IndexOutOfBoundsException("Left is out of bounds!");  //Switched with Up
                 else
                 {
-                    /*temp = result[row][col].getValue();
-                    result[row][col].setValue(result[row][col - 1].getValue());
-                    result[row][col - 1].setValue(temp); */
                     temp = result[row][col];
                     result[row][col] = result[row][col - 1];
                     result[row][col - 1] = temp;
@@ -183,9 +180,6 @@ public class State
                     throw new IndexOutOfBoundsException("Right is out of bounds!"); //Switched with Down
                 else
                 {
-                    /*temp = result[row][col].getValue();
-                    result[row][col].setValue(result[row][col + 1].getValue());
-                    result[row][col + 1].setValue(temp); */
                     temp = result[row][col];
                     result[row][col] = result[row][col + 1];
                     result[row][col + 1] = temp;
@@ -195,9 +189,6 @@ public class State
                     throw new IndexOutOfBoundsException("Up is out of bounds!");
                 else
                 {
-                    /*temp = result[row][col].getValue();
-                    result[row][col].setValue(result[row - 1][col].getValue());
-                    result[row - 1][col].setValue(temp); */
                     temp = result[row][col];
                     result[row][col] = result[row - 1][col];
                     result[row - 1][col] = temp;
@@ -207,9 +198,6 @@ public class State
                     throw new IndexOutOfBoundsException("Down is out of bounds!");
                 else
                 {
-                    /*temp = result[row][col].getValue();
-                    result[row][col].setValue(result[row + 1][col].getValue());
-                    result[row + 1][col].setValue(temp); */
                     temp = result[row][col];
                     result[row][col] = result[row + 1][col];
                     result[row + 1][col] = temp;
@@ -318,6 +306,10 @@ public class State
                 b.solveBeam(Integer.parseInt(command[2]));
             }
         }
+        else if (command[0].equals ("experiments"))
+        {
+            this.experiments(command[1]);
+        }
         else if (command[0].equals("quit"))
             return;
     }
@@ -386,6 +378,66 @@ public class State
           }
        }
        return totalDistance;
+    }
+    
+    /**
+     * Return the fraction of solvable puzzles
+     * @param heuristic h1 or h2
+     * @return 
+     */
+    public double experiments(String heuristic)
+    {
+        /*int solvedPuzzles = 0;
+        AStarSearch a;
+        if (searchType.equals("A-star"))
+        {
+            for (int i = 1; i <= 100; i++)
+            {
+                maxNodes = (i * 200);
+                this.randomizeState(i);
+                    if (secondArg.equals("h1"))
+                    {
+                        a = new AStarSearch(this, "h1");
+                        if (! (a.solveAStar(maxNodes).startsWith("Max")));
+                            solvedPuzzles++;
+                    }
+                    else if (secondArg.equals("h2"))
+                    {
+                        a = new AStarSearch(this, "h2");
+                        if (! (a.solveAStar(maxNodes).equals("Max Node Limit Reached!  A* couldn't complete!")));
+                            solvedPuzzles++;
+                    }
+                    else
+                        return solvedPuzzles; //heuristic invalid
+            }
+        }
+        System.out.println("Solved Puzzles: " + solvedPuzzles);
+        System.out.println("Fraction solvable for " + secondArg + ": " + (solvedPuzzles / 100.0));
+        return (solvedPuzzles / 100.0); */
+        double numSolved = 0;
+        AStarSearch a;
+        for (int i = 1; i <= 10; i++)
+        {
+            maxNodes = (i * 10);
+            this.randomizeState(i);
+            if (heuristic.equals("h1"))
+            {
+                a = new AStarSearch(this, "h1");
+                if (! (a.solveAStar(maxNodes).startsWith("Max")));
+                    numSolved++;
+            }
+            else if (heuristic.equals("h2"))
+            {
+                a = new AStarSearch(this, "h2");
+                if (! (a.solveAStar(maxNodes).startsWith("Max")));
+                    numSolved++;
+            }
+            else
+                return numSolved; //heuristic invalid
+        }
+        //System.out.println("Num Solved out of 10: " + numSolved);
+        return numSolved;
+
     }
     
     /**
