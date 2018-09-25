@@ -1,10 +1,15 @@
 setState b12 345 678
-experiments h1
+experimentC 1000
 setState b12 345 678
-experiments h2
+experimentA h1
+setState b12 345 678
+experimentA h2
+setState b12 345 678
+randomizeState 6
 maxNodes 10
 solve A-star h1
 setState b12 345 678
+randomizeState 7
 maxNodes 10
 solve A-star h2
 setState b12 345 678

@@ -137,6 +137,7 @@ public class BeamSearch
        mainPQ.add(start);
        boolean done = false;
        BeamNode goalNode = null;
+       int numLevels = 0;
        if (!(start.getState().isGoalState()))
        {
            outerLoop:
@@ -161,6 +162,9 @@ public class BeamSearch
                     counter++;
                }
                mainPQ = successorPQ;
+               numLevels++;
+               if (numLevels > 250)
+                   return "Infinite Loop Detected!  Beam Search couldn't complete.";
                successorPQ = new PriorityQueue();
            }
            String sequence = this.getSequence(goalNode);

@@ -306,9 +306,13 @@ public class State
                 b.solveBeam(Integer.parseInt(command[2]));
             }
         }
-        else if (command[0].equals ("experiments"))
+        else if (command[0].equals ("experimentA"))
         {
-            this.experiments(command[1]);
+            this.experimentA(command[1]);
+        }
+        else if (command[0].equals ("experimentC"))
+        {
+            this.experimentC(Integer.parseInt(command[1]));
         }
         else if (command[0].equals("quit"))
             return;
@@ -381,63 +385,84 @@ public class State
     }
     
     /**
-     * Return the fraction of solvable puzzles
+     * Method to conduct experiment A; Return the fraction of solvable puzzles
      * @param heuristic h1 or h2
      * @return 
      */
-    public double experiments(String heuristic)
+    public double experimentA(String heuristic)
     {
-        /*int solvedPuzzles = 0;
+        double h1NumSolved = 0;
+        double h2NumSolved = 0;
         AStarSearch a;
-        if (searchType.equals("A-star"))
+        for (int i = 1; i <= 1000; i++)
         {
-            for (int i = 1; i <= 100; i++)
-            {
-                maxNodes = (i * 200);
-                this.randomizeState(i);
-                    if (secondArg.equals("h1"))
-                    {
-                        a = new AStarSearch(this, "h1");
-                        if (! (a.solveAStar(maxNodes).startsWith("Max")));
-                            solvedPuzzles++;
-                    }
-                    else if (secondArg.equals("h2"))
-                    {
-                        a = new AStarSearch(this, "h2");
-                        if (! (a.solveAStar(maxNodes).equals("Max Node Limit Reached!  A* couldn't complete!")));
-                            solvedPuzzles++;
-                    }
-                    else
-                        return solvedPuzzles; //heuristic invalid
-            }
-        }
-        System.out.println("Solved Puzzles: " + solvedPuzzles);
-        System.out.println("Fraction solvable for " + secondArg + ": " + (solvedPuzzles / 100.0));
-        return (solvedPuzzles / 100.0); */
-        double numSolved = 0;
-        AStarSearch a;
-        for (int i = 1; i <= 10; i++)
-        {
-            maxNodes = (i * 10);
-            this.randomizeState(i);
+            maxNodes = (100);
+            this.randomizeState(1);
             if (heuristic.equals("h1"))
             {
+                //System.out.println("trying H1");
                 a = new AStarSearch(this, "h1");
-                if (! (a.solveAStar(maxNodes).startsWith("Max")));
-                    numSolved++;
+                String str = a.solveAStar(maxNodes);
+                //System.out.println(value);
+                if (! str.startsWith("Max"))
+                    h1NumSolved++;
             }
             else if (heuristic.equals("h2"))
             {
                 a = new AStarSearch(this, "h2");
-                if (! (a.solveAStar(maxNodes).startsWith("Max")));
-                    numSolved++;
+                String str = a.solveAStar(maxNodes);
+                if (! str.startsWith("Max"))
+                    h2NumSolved++;
             }
             else
-                return numSolved; //heuristic invalid
+                return h1NumSolved; //heuristic invalid
         }
-        //System.out.println("Num Solved out of 10: " + numSolved);
-        return numSolved;
+        System.out.println("h1 Num Solved out of 1000: " + h1NumSolved);
+        System.out.println("h2 Num Solved out of 1000: " + h2NumSolved);
+        return h1NumSolved;
 
+    }
+    
+    /**
+     * Method to conduct experiment C; return length of Beam and compare to A* length
+     * @param k
+     * @return 
+     */
+    public String experimentC(int k)
+    {
+        int beamSuccesses = 0;
+        int aStarH1Successes = 0;
+        int aStarH2Successes = 0;
+        StringBuilder builder1 = new StringBuilder();
+        StringBuilder builder2 = new StringBuilder();
+        StringBuilder builder3 = new StringBuilder();
+        BeamSearch b;
+        AStarSearch a1;
+        AStarSearch a2;
+        for (int i = 0; i <= 25; i++)
+        {
+             this.randomizeState(i);
+             b = new BeamSearch (this, k);
+             a1 = new AStarSearch (this, "h1");
+             a2 = new AStarSearch (this, "h2");
+             String beamResult = b.solveBeam(k);
+             if (beamResult.startsWith("Number"))
+                 beamSuccesses++;
+             String h1Result = a1.solveAStar(k);
+             if (h1Result.startsWith("A*"))
+                 aStarH1Successes++;
+             String h2Result = a2.solveAStar(k);
+             if (h2Result.startsWith("A*"))
+                 aStarH2Successes++;
+             builder1.append (beamResult);
+             builder2.append (h1Result);
+             builder3.append (h2Result);
+        }
+        System.out.println("Beam Ave. Seq. Length: " + (builder1.toString().length() / 10) + " A* h1 Ave. Seq. Length: " + (builder2.toString().length() / 10) +
+                 " A* h2 Ave. Seq. Length: " + (builder3.toString().length() / 10));
+        System.out.println("Beam #Successes: " + beamSuccesses + " H1 #Successes: " + aStarH1Successes + " H2 #Successes: " + aStarH2Successes);
+        return "Beam Ave. Seq. Length: " + (builder1.toString().length() / 10) + "A* h1 Ave. Seq. Length: " + (builder2.toString().length() / 10)
+                + "A* h2 Ave. Seq. Length: " + (builder3.toString().length() / 10);
     }
     
     /**

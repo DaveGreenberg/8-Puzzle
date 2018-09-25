@@ -153,12 +153,12 @@ public class AStarSearch
            }
            String sequence = this.getSequence(firstNode);
            System.out.println("A* Search Done! Number of moves: " + firstNode.getG() + ".\tSequence of moves: "+ sequence + '.');
-           return "Number of moves: " + firstNode.getG() + " Sequence of moves: "+ sequence;
+           return "A* Search Done! Number of moves: " + firstNode.getG() + ".\tSequence of moves: "+ sequence + '.';
        }
        else
        {
            System.out.println("Puzzle already solved!");
-           return "Puzzle already solved";
+           return "Puzzle already solved!";
        }
     } 
 }
