@@ -1,7 +1,7 @@
 
 /**
  * Class to store the information for a beam search node
- * @author Dave
+ * @author David Greenberg
  */
 public class BeamNode extends Node
 {

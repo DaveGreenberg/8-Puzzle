@@ -1,7 +1,7 @@
 
 /**
  * A class to package the States into the Priority Queue
- * @author Dave
+ * @author David Greenberg
  */
 public class Node implements Comparable<Node>
 {

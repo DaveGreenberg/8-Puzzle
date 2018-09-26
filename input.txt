@@ -1,26 +1,48 @@
 setState b12 345 678
-experimentC 1000
+solve A-star h1
 setState b12 345 678
-experimentA h1
+solve A-star h2
 setState b12 345 678
-experimentA h2
+solve beam 10
+
 setState b12 345 678
-randomizeState 6
+randomizeState 1
 maxNodes 10
+solve A-star h1
+setState b12 345 678
+randomizeState 1
+maxNodes 10
+solve A-star h1
+setState b12 345 678
+randomizeState 1
+solve beam 10
+
+setState b12 345 678
+randomizeState 7
+printState
+maxNodes 25
 solve A-star h1
 setState b12 345 678
 randomizeState 7
-maxNodes 10
+printState
+maxNodes 25
 solve A-star h2
 setState b12 345 678
-solve beam 10
-randomizeState 15
-solve beam 10
+randomizeState 7
+printState
+solve beam 50
+
 setState b12 345 678
-randomizeState 101
-maxNodes 50
+randomizeState 51
+printState
+maxNodes 1000
 solve A-star h1
 setState b12 345 678
-randomizeState 9
+randomizeState 51
+printState
 maxNodes 1000
 solve A-star h2
+setState b12 345 678
+randomizeState 51
+printState
+solve beam 1000

@@ -1,7 +1,7 @@
 
 /**
  * Class to represent a Tile
- * @author Dave
+ * @author David Greenberg
  */
 public class Tile 
 {

@@ -270,6 +270,7 @@ public class State
      */
     public void acceptCommands(String inputString)
     {
+        System.out.println(inputString);
         String[] command = inputString.split("\\s+");  //Split the input line using whitespace
         if (command[0].equals("setState"))
         {

@@ -5,7 +5,7 @@ import java.util.Stack;
 
 /**
  * Class to run Beam Search
- * @author Dave
+ * @author David Greenberg
  */
 public class BeamSearch 
 {
@@ -133,7 +133,7 @@ public class BeamSearch
      */
     public String solveBeam(int k)
     {
-       mainPQ.clear(); //Clear the PQ before use
+       mainPQ.clear();
        mainPQ.add(start);
        boolean done = false;
        BeamNode goalNode = null;
@@ -163,9 +163,12 @@ public class BeamSearch
                }
                mainPQ = successorPQ;
                numLevels++;
-               if (numLevels > 250)
+               if (numLevels > 250) //Arbitrary number, can increase if wanted
+               {
+                   System.out.println("Infinite Loop Detected!  Beam Search couldn't complete.");
                    return "Infinite Loop Detected!  Beam Search couldn't complete.";
-               successorPQ = new PriorityQueue();
+               }
+               successorPQ = new PriorityQueue();  //Need to reference a new spot in memory.  Very important!
            }
            String sequence = this.getSequence(goalNode);
            System.out.println("Beam Search Done! Number of moves: " + goalNode.getG() + ".\tSequence of moves: "+ sequence + '.');

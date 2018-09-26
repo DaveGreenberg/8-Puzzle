@@ -5,7 +5,7 @@ import java.util.Stack;
 
 /**
  * A class to handle solving the 8-puzzle with A* search
- * @author Dave
+ * @author David Greenberg
  */
 public class AStarSearch 
 {
